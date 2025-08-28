@@ -1,0 +1,26 @@
+                                                          Meta-Lab
+
+Scenario:
+The attached images were posted by a criminal on the run, with the caption "I'm roaming free. You will never catch me". We believe you can assist us in proving him wrong. 
+
+#This lab contains a folder.zip and 2 photos, one with the extension '.png' and '.JPG' to start will gonna use the file with extension '.JPG'.
+
+ What is the camera model?
+# To check this use a tool like exiftool, this tool deploy a lot of data.
+A-Canon ### ####
+
+ When was the picture taken?
+# We can search the date im the information obtained by the command used.
+A-2021:##:02 13:20:23
+
+ What does the comment on the first image says?
+# Also we can find the comment in the information.
+A-relying on altered metadata to catch me?
+
+ Where could the criminal be?
+# You can upload the second photo in a web to track the country and city
+A-Kathmandu
+
+Resume:
+A simple lab where you can work with metadata and information in images
+
