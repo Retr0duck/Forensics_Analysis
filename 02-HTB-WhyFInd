@@ -1,0 +1,11 @@
+                                             WhyFind - Hack the box lab
+## This labs only describes what happen and how i solve it, but the answers are hidden.
+
+Scenario:
+We have been hot on the trail for a political dissident.
+They jump from café to café using the Wi-Fi making it hard to nab them.
+During one of their trips, they unknowingly sat next to one of our agents and we captured them with their laptop on.
+We need to know where they have been and what they have been doing. Analyze the KAPE output and see if you can get us some answers.
+
+# We receive a .zip file, the password is "hacktheblue" and inside are another .zip document named 'KAPEOUT.zip',
+# that file don't need a password, then i get 
