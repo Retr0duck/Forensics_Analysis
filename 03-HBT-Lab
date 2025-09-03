@@ -1,0 +1,134 @@
+FORENSIC REPORT – BYTE DOCTOR REYES LAB
+
+Background:
+Byte Doctor Reyes researcher analyzes a post-breach attack in which several Windows Defender logs and alerts appear missing or manipulated.
+
+The attacker used defense evasion techniques to remain undetected and maintain control of the compromised system.
+
+Objective:
+Identify how the attacker compromised the system and what evasion and persistence techniques they used.
+
+FORENSIC FINDINGS
+
+1. Disabling LSA Protection
+Action detected:
+"C:\WINDOWS\system32\reg.exe" add HKLM\SYSTEM\CurrentControlSet\Control\LSA /v RunAsPPL /t REG_DWORD /d 0
+
+Registry key modified:
+HKLM\SYSTEM\CurrentControlSet\Control\LSA\RunAsPPL
+
+Effect:
+Disables LSA Protection, exposing the LSASS process to credential dumping techniques.
+
+Impact:
+Allows an attacker to access credentials in memory without being blocked by Windows Defender or other protections.
+
+MITRE ATT&CK:
+T1562.001 – Impair Defenses: Disable or Modify Tools
+
+Suggested Mitigation Measures:
+- Monitoring for changes to critical security registry keys (LSA\RunAsPPL)
+- SIEM alerts for security-related registry modifications
+
+---
+
+2. Modifying Windows Defender Preferences (PowerShell)
+Action Detected:
+Set-MpPreference -DisableIOAVProtection $true -DisableEmailScanning $true -DisableBlockAtFirstSeen $true
+
+Preferences Changed:
+- DisableIOAVProtection = True → Disables protection against downloaded files/attachments
+- DisableEmailScanning = True → Disables email scanning
+- DisableBlockAtFirstSeen = True → Disables blocking of newly detected malicious files
+
+Impact:
+Significantly reduces early detection threat intelligence, allowing malware to execute without immediate alerts.
+
+MITRE ATT&CK:
+T1562.001 – Impair Defenses: Disable or Modify Tools
+
+Suggested Mitigation Measures:
+- Monitor changes to Windows Defender configurations using PowerShell events or security policy audits.
+
+---
+
+3. AMSI Patch in PowerShell
+Action Detected:
+The attacker loaded C# code from PowerShell to patch amsi.dll, disabling script inspection.
+
+Function Patched:
+AmsiScanBuffer
+
+Code Used (Fragment):
+IntPtr h = GetModuleHandle("amsi.dll");
+IntPtr a = GetProcAddress(h, "AmsiScanBuffer");
+VirtualProtect(a, (UIntPtr)5, 0x40, out oldProtect);
+byte[] patch = { 0x31, 0xC0, 0xC3 };
+Marshal.Copy(patch, 0, a, patch.Length);
+
+Impact:
+- AMSI is disabled, allowing malicious scripts to run in memory without detection.
+- Facilitates the execution of fileless malware.
+
+MITRE ATT&CK:
+T1562.001 – Impair Defenses: Disable or Modify Tools
+
+Suggested Mitigation Measures:
+- Monitoring for dynamic loading of critical DLLs (amsi.dll)
+- Alerts for suspicious kernel32.dll functions such as VirtualProtect in PowerShell processes
+
+---
+
+4. Reboot in Safe Mode with Networking Support
+Detected Action:
+bcdedit.exe /set safeboot network
+
+Technical Explanation:
+- Modifies the boot configuration to boot the system in Safe Mode with networking support.
+
+Impact:
+- Minimizes active security services, facilitating malware execution or maintaining persistence.
+
+MITRE ATT&CK:
+T1543.003 – Windows Service / Boot Modification
+
+Suggested Mitigation Measures:
+- Monitor BCD changes (bcdedit) using system event auditing
+- Alerts for unexpected reboots in Safe Mode
+
+---
+
+5. Disabling PowerShell Command History
+Action Detected:
+Set-PSReadlineOption -HistorySaveStyle SaveNothing
+
+Technical Explanation:
+- Disables the storage of PowerShell command history, eliminating traceability.
+
+Impact:
+- Commands executed by the attacker are not logged, making auditing and forensic analysis difficult.
+
+MITRE ATT&CK:
+T1070.004 – Indicator Removal on Host: Clear Command History
+
+Suggested mitigation measures:
+- Enable advanced PowerShell logging (Transcription / Module Logging)
+- Review critical cmdlet execution events using SIEM
+
+---
+
+CONCLUSION
+The attacker performed a post-exploitation attack focused on evading defenses and controlling the system.
+The sequence of actions included:
+
+1. Disabling critical Windows protections (LSA, Windows Defender, AMSI).
+2. Controlling the environment by rebooting into Safe Mode with network support.
+3. Eliminating traces by disabling PowerShell history.
+
+This approach allowed the attacker to execute and maintain malicious code on the system undetected, demonstrating an advanced evasion strategy.
+
+General Recommendations:
+- Implement registry audits and critical configuration changes
+- Enable full PowerShell Logging and critical DLL monitoring
+- Configure Safe Mode alerts and BCD changes
+- Apply security updates and patches for AMSI and Windows Defender
