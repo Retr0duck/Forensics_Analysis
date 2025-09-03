@@ -1,0 +1,88 @@
+Forensic Lab Report – BTLO Challenge: Shiba Insider
+
+Date: August 30, 2025
+Analyst: Pato
+Tools Utilized: Wireshark, CyberChef, Steghide, Exiftool, Command Line
+
+1. Objective
+
+The goal of this forensic challenge was to identify a potential insider within a simulated environment.
+The task required analyzing network traffic, files, and image metadata to extract hidden information and determine the attacker’s profile.
+
+2. Methodology and Findings
+2.1 Network Traffic Analysis
+
+Tool: Wireshark
+
+The provided PCAP file was examined, revealing two HTTP transactions: a request (HTTP Request) and a response (HTTP Response).
+
+The HTTP response contained the following message:
+> use your own password
+This served as a hint for subsequent authentication procedures.
+
+2.2 ZIP File Access
+
+Tool: CyberChef (Base64 decoding)
+
+Credentials encoded in Base64 were identified in the HTTP response.
+
+Decoding yielded:
+
+Username: fakeblue
+
+Password: redforever
+
+These credentials successfully unlocked file.zip.
+
+The README.txt confirmed that no additional passwords were required.
+
+2.3 Image Metadata Examination
+
+Tool: Exiftool
+
+Metadata analysis revealed an unusual entry:
+
+Field: Technique
+
+Value: Steganography
+
+This indicated the presence of hidden data within the image file.
+
+2.4 Hidden Data Extraction
+
+Tool: Steghide
+
+Steghide was used to extract the hidden content from the image.
+
+The extracted text file contained a unique ID:
+> 0726ba878ea47de571777a
+
+2.5 Insider Identification
+
+The extracted ID was consistent with user ID lengths in the BTLO platform.
+
+Using the ID to search within BTLO revealed the insider’s profile:
+> bluetiger
+
+3. Conclusions
+
+
+The HTTP response message provided guidance for password retrieval.
+
+Credentials decoded from Base64 enabled access to the ZIP file.
+
+Hidden information in the image was successfully discovered and extracted using metadata analysis and steganography tools.
+
+The extracted ID led directly to the identification of the insider as bluetiger.
+
+4. Tools Summary
+
+Wireshark: Network traffic inspection and HTTP message analysis
+
+CyberChef: Base64 decoding of credentials
+
+Exiftool: Metadata examination of files
+
+Steghide: Extraction of hidden data from multimedia files
+
+Command Line: File handling and tool execution
