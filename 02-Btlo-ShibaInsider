@@ -1,88 +1,89 @@
-Forensic Lab Report – BTLO Challenge: Shiba Insider
+# Informe de Análisis Forense – BTLO Challenge: Shiba Insider
 
-Date: August 30, 2025
-Analyst: Patricio
-Tools Utilized: Wireshark, CyberChef, Steghide, Exiftool, Command Line
+**Fecha:** 30 de agosto de 2025  
+**Analista:** Patricio Villarreal 
+**Herramientas utilizadas:** Wireshark, CyberChef, Steghide, Exiftool, Línea de comandos
 
-1. Objective
+---
 
-The goal of this forensic challenge was to identify a potential insider within a simulated environment.
-The task required analyzing network traffic, files, and image metadata to extract hidden information and determine the attacker’s profile.
+## 1. Objetivo
 
-2. Methodology and Findings
-2.1 Network Traffic Analysis
+El propósito de este análisis forense fue identificar a un posible infiltrado dentro de un entorno simulado. Se solicitó el análisis de tráfico de red, archivos y metadatos de imágenes para extraer información oculta y determinar el perfil del atacante.
 
-Tool: Wireshark
+---
 
-The provided PCAP file was examined, revealing two HTTP transactions: a request (HTTP Request) and a response (HTTP Response).
+## 2. Metodología y Hallazgos
 
-The HTTP response contained the following message:
-> use your own password
-This served as a hint for subsequent authentication procedures.
+### 2.1 Análisis de Tráfico de Red
 
-2.2 ZIP File Access
+**Herramienta:** Wireshark
 
-Tool: CyberChef (Base64 decoding)
+- Se examinó el archivo PCAP proporcionado, identificando dos transacciones HTTP: una solicitud y una respuesta.
+- La respuesta HTTP contenía el mensaje:
+  > use your own password
+- Este mensaje sirvió como pista para los procedimientos de autenticación siguientes.
 
-Credentials encoded in Base64 were identified in the HTTP response.
+---
 
-Decoding yielded:
+### 2.2 Acceso a Archivo ZIP
 
-Username: fakeblue
+**Herramienta:** CyberChef (decodificación Base64)
 
-Password: redforever
+- En la respuesta HTTP se identificaron credenciales codificadas en Base64.
+- Tras la decodificación, se obtuvieron los siguientes datos:
 
-These credentials successfully unlocked file.zip.
+  - **Usuario:** fakeblue
+  - **Contraseña:** redforever
 
-The README.txt confirmed that no additional passwords were required.
+- Estas credenciales permitieron desbloquear el archivo `file.zip`.
+- El archivo `README.txt` confirmó que no se requerían contraseñas adicionales.
 
-2.3 Image Metadata Examination
+---
 
-Tool: Exiftool
+### 2.3 Examen de Metadatos de Imagen
 
-Metadata analysis revealed an unusual entry:
+**Herramienta:** Exiftool
 
-Field: Technique
+- El análisis de metadatos reveló una entrada inusual:
+  - **Campo:** Technique
+  - **Valor:** Steganography
+- Esto indicó la presencia de datos ocultos en el archivo de imagen.
 
-Value: Steganography
+---
 
-This indicated the presence of hidden data within the image file.
+### 2.4 Extracción de Datos Ocultos
 
-2.4 Hidden Data Extraction
+**Herramienta:** Steghide
 
-Tool: Steghide
+- Se utilizó Steghide para extraer el contenido oculto de la imagen.
+- El archivo de texto extraído contenía un ID único:
+  > 0726ba878ea47de571777a
 
-Steghide was used to extract the hidden content from the image.
+---
 
-The extracted text file contained a unique ID:
-> 0726ba878ea47de571777a
+### 2.5 Identificación del Infiltrado
 
-2.5 Insider Identification
+- El ID extraído coincidía con la longitud típica de los IDs de usuario en la plataforma BTLO.
+- La búsqueda del ID en BTLO permitió identificar el perfil del infiltrado:
+  > bluetiger
 
-The extracted ID was consistent with user ID lengths in the BTLO platform.
+---
 
-Using the ID to search within BTLO revealed the insider’s profile:
-> bluetiger
+## 3. Conclusiones
 
-3. Conclusions
+- El mensaje de la respuesta HTTP proporcionó la clave para recuperar la contraseña.
+- Las credenciales decodificadas en Base64 permitieron acceder al archivo ZIP.
+- La información oculta en la imagen fue descubierta y extraída gracias al análisis de metadatos y herramientas de esteganografía.
+- El ID extraído condujo directamente a la identificación del infiltrado: **bluetiger**.
 
+---
 
-The HTTP response message provided guidance for password retrieval.
+## 4. Resumen de Herramientas Utilizadas
 
-Credentials decoded from Base64 enabled access to the ZIP file.
+- **Wireshark:** Inspección de tráfico de red y análisis de mensajes HTTP.
+- **CyberChef:** Decodificación Base64 de credenciales.
+- **Exiftool:** Examen de metadatos en archivos.
+- **Steghide:** Extracción de datos ocultos en archivos multimedia.
+- **Línea de comandos:** Manejo de archivos y ejecución de herramientas.
 
-Hidden information in the image was successfully discovered and extracted using metadata analysis and steganography tools.
-
-The extracted ID led directly to the identification of the insider as bluetiger.
-
-4. Tools Summary
-
-Wireshark: Network traffic inspection and HTTP message analysis
-
-CyberChef: Base64 decoding of credentials
-
-Exiftool: Metadata examination of files
-
-Steghide: Extraction of hidden data from multimedia files
-
-Command Line: File handling and tool execution
+---
