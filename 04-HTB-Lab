@@ -1,0 +1,80 @@
+# HTB Lab Forensic – Suspicious Login Event
+
+## Context
+The SOC detected a suspicious login event with an **IP and workstation name mismatch**.  
+A **network capture** and **event logs** were provided around the incident time. The objective is to correlate the evidence and report findings to the SOC manager.
+
+---
+
+## Findings
+
+### 1. Workstation IPs
+- **Forela-Wkstn001:** `172.17.79.129`  
+- **Forela-Wkstn002:** `172.17.79.136`  
+
+---
+
+### 2. User Account Whose Hash Was Stolen
+- **Protocol analyzed:** SMB2  
+- **Username:** `FORELA/arthur.kyle`  
+- **Compromised account:** `arthur.kyle`  
+
+**Notes:**  
+- Filtering the network capture by SMB2 traffic allowed identification of the compromised account.  
+- The attacker successfully obtained the **NTLM hash** of this user.  
+
+---
+
+### 3. Attacker’s Device IP
+- **Unknown Device used by attacker to intercept credentials:** `172.17.79.135`  
+
+**Notes:**  
+- This IP was identified in the network capture intercepting SMB2 traffic between the victim workstation and the domain controller.  
+- Indicates a **Man-in-the-Middle (MiTM)** or similar credential interception.  
+
+---
+
+### 4. File Share Accessed by Victim
+- **Fileshare navigated by the victim user account:** `\\DC01\Trip`  
+
+**Notes:**  
+- Logs and network captures show `arthur.kyle` accessing this share before the credentials were intercepted.  
+- Helps reconstruct the timeline and victim activity prior to compromise.  
+
+---
+
+### 5. Malicious Session Details
+- **Source port used for logon:** `40252`  
+- **Logon ID:** `0x64A799`  
+- **Workstation name:** `FORELA-WKSTN002`  
+- **Source IP of malicious logon:** `172.17.79.135`  
+- **Timestamp (UTC):** `2024-07-31 04:55:16`  
+
+**Notes:**  
+- Detection was triggered by a **hostname vs. assigned IP mismatch**.  
+- Correlating the logon ID and source port confirms the malicious session.  
+
+---
+
+### 6. Share Accessed by Attacker’s Tool
+- **Share name accessed by malicious tool:** `\\*\IPC$`  
+
+**Notes:**  
+- The attacker used the administrative IPC$ share to authenticate and move laterally or perform credential harvesting.  
+- Confirms the attack vector used for the compromise.  
+
+---
+
+## Conclusion
+The attacker performed a **post-exploitation attack focused on credential theft and lateral movement**.  
+
+**Key steps identified:**  
+1. Compromised user account (`arthur.kyle`) via SMB2.  
+2. Intercepted credentials from the unknown attacker device (`172.17.79.135`).  
+3. Malicious logon from `FORELA-WKSTN002` using `IPC$` share.  
+
+**Recommendations:**  
+- Monitor for hostname and IP mismatches in login events.  
+- Enable SMB auditing and capture logs for lateral movement detection.  
+- Implement network segmentation and monitor administrative shares (IPC$).  
+- Investigate unknown devices on the network performing MiTM or sniffing activity.
